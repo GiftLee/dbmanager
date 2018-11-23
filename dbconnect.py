@@ -1,10 +1,12 @@
 
 import pymysql
 import sys
+import sqlparse
 
 def db_info():
     try:
-        db = pymysql.connect(host="10.10.10.175", user="root", password="root", database="dbmanager", port=3306,charset='utf8mb4', cursorclass=pymysql.cursors.DictCursor)
+        db = pymysql.connect(host="10.10.10.175", user="root", password="root", database="dbmanager", port=3306,charset='utf8mb4',
+                             cursorclass=pymysql.cursors.DictCursor)
         cursor = db.cursor()
         cursor.execute("select  DISTINCT db_type from db_info")
         dbtype = cursor.fetchall()
@@ -40,9 +42,9 @@ def exec_sql(sql,dbinfo):
             db = pymysql.connect(host="%s"%(host), user="%s"%(user), password="%s"%(password), database="%s"%(database), port=port,
                                  cursorclass=pymysql.cursors.DictCursor)
             cursor = db.cursor()
-            cursor.execute("set sql_log_bin=0")
-            cursor.execute(sql)
-            data = cursor.fetchall()
+            for j in range(len(sql)):
+                cursor.execute(sql[j])
+                data = cursor.fetchall()
             print(data)
     except pymysql.Error as e:
         print(e)
@@ -53,6 +55,16 @@ def exec_sql(sql,dbinfo):
         db.close()
 
 
-sql="show variables like '%log_bin%'"
+
+def sql_parse(sql):
+
+    sqlp=sqlparse.split(sql)
+    return sqlp
+
+
+sql1="set sql_log_bin=0;\n show variables like '%sql_log_bin%'"
+#print(sql1)
+sql=sql_parse(sql1)
+#print(sql)
 result=db_info()
 exec = exec_sql(sql=sql,dbinfo=result)
