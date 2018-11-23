@@ -15,11 +15,14 @@ def db_info():
                 #print(sql)
                 cursor.execute(sql)
                 dbinfo = cursor.fetchall()
-                cursor.close()
-                db.close()
-            return dbinfo
+                return dbinfo
     except pymysql.Error as e:
         print(e)
+    finally:
+
+        cursor.close()
+        db.commit()
+        db.close()
 
 
 
@@ -40,12 +43,14 @@ def exec_sql(sql,dbinfo):
             cursor.execute("set sql_log_bin=0")
             cursor.execute(sql)
             data = cursor.fetchall()
-            db.commit()
-            cursor.close()
-            db.close()
             print(data)
     except pymysql.Error as e:
         print(e)
+    finally:
+
+        cursor.close()
+        db.commit()
+        db.close()
 
 
 sql="show variables like '%log_bin%'"
